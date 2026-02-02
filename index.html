@@ -1,0 +1,2633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoxType - Voice to Text, Instantly</title>
+  <meta name="description"
+    content="Local Whisper-powered speech recognition for Mac. No cloud. No latency. Just pure privacy.">
+
+  <!-- Favicon & Theme -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#000000">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://VoxType.app/">
+  <meta property="og:title" content="VoxType - Voice to Text, Instantly">
+  <meta property="og:description"
+    content="Local Whisper-powered speech recognition for Mac. No cloud. No latency. Just pure privacy.">
+  <meta property="og:image" content="https://VoxType.app/og-image.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://VoxType.app/">
+  <meta name="twitter:title" content="VoxType - Voice to Text, Instantly">
+  <meta name="twitter:description"
+    content="Local Whisper-powered speech recognition for Mac. No cloud. No latency. Just pure privacy.">
+  <meta name="twitter:image" content="https://VoxType.app/og-image.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "VoxType",
+    "operatingSystem": "macOS",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "Local Whisper-powered speech recognition for Mac. No cloud. No latency. Just pure privacy.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "name": "Free"
+      },
+      {
+        "@type": "Offer",
+        "price": "29",
+        "priceCurrency": "USD",
+        "name": "Pro",
+        "priceValidUntil": "2026-12-31"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1200"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --color-black: #000000;
+      --color-white: #FFFFFF;
+      --color-gray-100: #F4F4F5;
+      --color-gray-200: #E4E4E7;
+      --color-gray-400: #A1A1AA;
+      --color-gray-500: #71717A;
+      --color-gray-800: #27272A;
+      --color-gray-900: #18181B;
+
+      /* 新增：渐变色 */
+      --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-cool: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+
+      /* 新增：品牌色 */
+      --color-primary: #667eea;
+      --color-primary-dark: #5568d3;
+      --color-accent: #f5576c;
+
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-white);
+      color: var(--color-black);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* 背景装饰 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Scroll Animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered Animation Delays */
+    .delay-1 {
+      transition-delay: 0.1s;
+    }
+
+    .delay-2 {
+      transition-delay: 0.2s;
+    }
+
+    .delay-3 {
+      transition-delay: 0.3s;
+    }
+
+    .delay-4 {
+      transition-delay: 0.4s;
+    }
+
+    /* Smooth Scroll */
+    * {
+      scroll-behavior: smooth;
+    }
+
+    /* Selection Color */
+    ::selection {
+      background: rgba(102, 126, 234, 0.3);
+      color: var(--color-black);
+    }
+
+    ::-moz-selection {
+      background: rgba(102, 126, 234, 0.3);
+      color: var(--color-black);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-gray-100);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gradient-primary);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary-dark);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 120px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .header:hover {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav {
+      display: flex;
+      gap: 40px;
+    }
+
+    .nav a {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-gray-500);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 8px 0;
+    }
+
+    .nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+    }
+
+    .nav a:hover {
+      color: var(--color-primary);
+    }
+
+    .nav a:hover::after {
+      width: 100%;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: var(--color-white);
+      padding: 12px 28px;
+      border-radius: 24px;
+      font-size: 15px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-lg {
+      padding: 18px 40px;
+      border-radius: 28px;
+      font-size: 17px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--color-black);
+      border: 2px solid var(--color-black);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+      z-index: -1;
+    }
+
+    .btn-outline:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-outline:hover {
+      color: var(--color-white);
+      border-color: transparent;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-white {
+      background: var(--color-white);
+      color: var(--color-black);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .btn-white::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      transition: width 0.6s ease, height 0.6s ease;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+
+    .btn-white:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-white:hover {
+      color: var(--color-white);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 100px 120px 80px;
+      gap: 48px;
+      background: var(--color-white);
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 8px 20px;
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-primary);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .badge:hover {
+      background: rgba(102, 126, 234, 0.15);
+      transform: scale(1.05);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 72px;
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -3px;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 20px;
+      color: var(--color-gray-500);
+      line-height: 1.6;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .screenshot-container {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .screenshot-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--gradient-primary);
+      border-radius: 22px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: -1;
+    }
+
+    .screenshot-container:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 35px 60px -12px rgba(102, 126, 234, 0.25);
+    }
+
+    .screenshot-container:hover::before {
+      opacity: 1;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Core Features Section */
+    .core-features {
+      background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
+      padding: 100px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .core-features::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--color-gray-500);
+      text-transform: uppercase;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-gray-500));
+    }
+
+    .section-label::before {
+      right: 100%;
+      background: linear-gradient(90deg, transparent, var(--color-gray-500));
+    }
+
+    .section-label::after {
+      left: 100%;
+      background: linear-gradient(90deg, var(--color-gray-500), transparent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .section-title-light {
+      color: var(--color-white);
+    }
+
+    .section-title-dark {
+      color: var(--color-black);
+    }
+
+    .section-subtitle {
+      font-size: 18px;
+      color: var(--color-gray-500);
+    }
+
+    .features-grid {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .feature-card {
+      width: 380px;
+      padding: 32px;
+      background: rgba(39, 39, 42, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: -1;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-card:hover::before {
+      opacity: 0.1;
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-white);
+    }
+
+    .feature-desc {
+      font-size: 15px;
+      color: var(--color-gray-400);
+      line-height: 1.6;
+    }
+
+    /* Pro Features Section */
+    .pro-features {
+      background: var(--color-white);
+      padding: 100px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+    }
+
+    .pro-grid {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .pro-card {
+      width: 280px;
+      padding: 28px;
+      background: rgba(244, 244, 245, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .pro-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
+      border-color: rgba(102, 126, 234, 0.2);
+    }
+
+    .pro-card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-black);
+      transition: all 0.3s ease;
+    }
+
+    .pro-card:hover .pro-card-title {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .pro-card-desc {
+      font-size: 14px;
+      color: var(--color-gray-500);
+      line-height: 1.5;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      background: var(--color-gray-100);
+      padding: 100px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+    }
+
+    .pricing-cards {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .pricing-card {
+      width: 400px;
+      padding: 40px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .pricing-card-free {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .pricing-card-free:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+
+    .pricing-card-pro {
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+      position: relative;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .pricing-card-pro::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg,
+          transparent 0deg 340deg,
+          rgba(102, 126, 234, 0.5) 340deg 360deg);
+      animation: rotate 6s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .pricing-card-pro>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .pricing-card-pro:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 60px rgba(102, 126, 234, 0.3);
+    }
+
+    .pricing-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pricing-badge {
+      display: inline-flex;
+      padding: 6px 12px;
+      background: var(--gradient-accent);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--color-white);
+      width: fit-content;
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .pricing-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .pricing-price {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .pricing-price-num {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .pricing-price-period {
+      font-size: 16px;
+      color: var(--color-gray-500);
+      margin-bottom: 8px;
+    }
+
+    .pricing-desc {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .pricing-divider {
+      height: 1px;
+      width: 100%;
+    }
+
+    .pricing-divider-light {
+      background: var(--color-gray-200);
+    }
+
+    .pricing-divider-dark {
+      background: var(--color-gray-800);
+    }
+
+    .pricing-features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .pricing-feature {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .pricing-btn {
+      padding: 16px 32px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .pricing-btn-outline {
+      border: 2px solid var(--color-black);
+      color: var(--color-black);
+      background: transparent;
+    }
+
+    .pricing-btn-outline:hover {
+      background: var(--color-black);
+      color: var(--color-white);
+    }
+
+    .pricing-btn-white {
+      background: var(--color-white);
+      color: var(--color-black);
+    }
+
+    .pricing-btn-white:hover {
+      opacity: 0.9;
+    }
+
+    /* Final CTA Section */
+    .final-cta {
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+      padding: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+      }
+    }
+
+    .final-title {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.05;
+      background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 1;
+    }
+
+    .final-subtitle {
+      font-size: 18px;
+      color: var(--color-gray-400);
+    }
+
+    .trust-line {
+      font-size: 14px;
+      color: var(--color-gray-500);
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 120px;
+      height: 100px;
+      background: rgba(244, 244, 245, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-dot {
+      font-size: 20px;
+      color: var(--color-gray-400);
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--color-gray-500);
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .footer-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-gray-500);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .footer-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--color-primary);
+    }
+
+    .footer-link:hover::after {
+      width: 100%;
+    }
+
+    .footer-copy {
+      font-size: 14px;
+      color: var(--color-gray-400);
+    }
+
+    /* Text Color Utilities (replacing inline styles) */
+    .text-black {
+      color: var(--color-black);
+    }
+
+    .text-white {
+      color: var(--color-white);
+    }
+
+    .text-gray-400 {
+      color: var(--color-gray-400);
+    }
+
+    .text-gray-500 {
+      color: var(--color-gray-500);
+    }
+
+    /* Mobile Menu */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 28px;
+      height: 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 200;
+    }
+
+    .menu-toggle span {
+      width: 100%;
+      height: 3px;
+      background: var(--color-black);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-checkbox {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: none;
+    }
+
+    /* Language Switcher */
+    .lang-switcher {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .lang-btn:hover {
+      background: rgba(102, 126, 234, 0.15);
+      border-color: rgba(102, 126, 234, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .lang-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .lang-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 200;
+    }
+
+    .lang-switcher.open .lang-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .lang-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-gray-800);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .lang-option::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--gradient-primary);
+      transform: scaleY(0);
+      transition: transform 0.2s ease;
+    }
+
+    .lang-option:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: var(--color-primary);
+    }
+
+    .lang-option:hover::before {
+      transform: scaleY(1);
+    }
+
+    .lang-option.active {
+      background: rgba(102, 126, 234, 0.15);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .lang-option.active::before {
+      transform: scaleY(1);
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+
+      .header,
+      .hero,
+      .core-features,
+      .pro-features,
+      .pricing,
+      .final-cta,
+      .footer {
+        padding-left: 60px;
+        padding-right: 60px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .header {
+        padding: 0 24px;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      /* Mobile Menu Styles */
+      .menu-toggle {
+        display: flex;
+      }
+
+      .mobile-nav {
+        display: none;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        background: var(--color-white);
+        padding: 24px;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 99;
+      }
+
+      .mobile-nav a {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--color-gray-800);
+        text-decoration: none;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--color-gray-200);
+      }
+
+      .menu-checkbox:checked~.mobile-nav {
+        display: flex;
+      }
+
+      .menu-checkbox:checked~.menu-toggle span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+      }
+
+      .menu-checkbox:checked~.menu-toggle span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-checkbox:checked~.menu-toggle span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+      }
+
+      .hero {
+        padding: 60px 24px;
+      }
+
+      .hero-title {
+        font-size: 48px;
+        letter-spacing: -2px;
+      }
+
+      .hero-subtitle {
+        font-size: 16px;
+      }
+
+      .cta-row {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .cta-row .btn {
+        width: 100%;
+      }
+
+      .screenshot-container {
+        border-radius: 12px;
+      }
+
+      .core-features,
+      .pro-features,
+      .pricing {
+        padding: 60px 24px;
+      }
+
+      .section-title {
+        font-size: 36px;
+      }
+
+      .features-grid,
+      .pro-grid,
+      .pricing-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .feature-card,
+      .pro-card,
+      .pricing-card {
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .final-cta {
+        padding: 60px 24px;
+      }
+
+      .final-title {
+        font-size: 36px;
+      }
+
+      .footer {
+        flex-direction: column;
+        height: auto;
+        padding: 40px 24px;
+        gap: 24px;
+      }
+
+      .footer-left,
+      .footer-right {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header" role="banner">
+    <a href="#" class="logo" aria-label="VoxType Home">VoxType</a>
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+    </nav>
+    <!-- Mobile Menu -->
+    <input type="checkbox" id="menu-toggle" class="menu-checkbox" aria-hidden="true">
+    <label for="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    <nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="#download" data-i18n="nav.download">Download</a>
+    </nav>
+    <div class="header-actions">
+      <!-- Language Switcher -->
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn" aria-label="Switch language">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path
+              d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span id="currentLang">EN</span>
+        </button>
+        <div class="lang-dropdown">
+          <div class="lang-option" data-lang="en">English</div>
+          <div class="lang-option" data-lang="zh">简体中文</div>
+          <div class="lang-option" data-lang="zh-TW">繁體中文</div>
+          <div class="lang-option" data-lang="ja">日本語</div>
+          <div class="lang-option" data-lang="ko">한국어</div>
+          <div class="lang-option" data-lang="es">Español</div>
+          <div class="lang-option" data-lang="fr">Français</div>
+          <div class="lang-option" data-lang="de">Deutsch</div>
+          <div class="lang-option" data-lang="pt">Português</div>
+          <div class="lang-option" data-lang="ru">Русский</div>
+        </div>
+      </div>
+      <a href="#download" class="btn btn-primary" data-i18n="nav.downloadFree">Download Free</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-content fade-in">
+      <span class="badge" data-i18n="hero.badge">macOS Native · Privacy First</span>
+      <h1 id="hero-title" class="hero-title" data-i18n="hero.title">Voice to Text,<br>Instantly.</h1>
+      <p class="hero-subtitle" data-i18n="hero.subtitle">Local Whisper-powered speech recognition for Mac.<br>No cloud.
+        No latency. Just pure privacy.</p>
+      <div class="cta-row">
+        <a href="#download" class="btn btn-primary btn-lg" data-i18n="hero.ctaPrimary">Download for Free</a>
+        <a href="#features" class="btn btn-outline btn-lg" data-i18n="hero.ctaSecondary">View Features</a>
+      </div>
+    </div>
+    <div class="screenshot-container fade-in delay-2">
+      <img src="setting.png" alt="VoxType 设置界面截图 - 展示常规设置、听写模型、录音模式等功能" class="screenshot-img">
+    </div>
+  </section>
+
+  <!-- Core Features Section -->
+  <section id="features" class="core-features" aria-labelledby="features-title">
+    <div class="section-header fade-in">
+      <span class="section-label" data-i18n="features.label">WHY VoxType</span>
+      <h2 id="features-title" class="section-title section-title-light" data-i18n="features.title">Designed for
+        Privacy.<br>Built for Speed.</h2>
+    </div>
+    <div class="features-grid">
+      <article class="feature-card fade-in delay-1">
+        <div class="feature-icon" aria-hidden="true">🔒</div>
+        <h3 class="feature-title" data-i18n="features.local.title">100% Local Processing</h3>
+        <p class="feature-desc" data-i18n="features.local.desc">Your voice never leaves your Mac. All processing happens
+          on-device using the powerful Whisper engine.</p>
+      </article>
+      <article class="feature-card fade-in delay-2">
+        <div class="feature-icon" aria-hidden="true">⚡</div>
+        <h3 class="feature-title" data-i18n="features.latency.title">Sub-500ms Latency</h3>
+        <p class="feature-desc" data-i18n="features.latency.desc">Near real-time transcription powered by Apple Silicon
+          optimization. Speak and see text appear instantly.</p>
+      </article>
+      <article class="feature-card fade-in delay-3">
+        <div class="feature-icon" aria-hidden="true">✈️</div>
+        <h3 class="feature-title" data-i18n="features.offline.title">Offline Ready</h3>
+        <p class="feature-desc" data-i18n="features.offline.desc">Works anywhere without internet. On a plane, in a
+          tunnel, or in a meeting room with no signal.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Pro Features Section -->
+  <section class="pro-features" aria-labelledby="pro-title">
+    <div class="section-header fade-in">
+      <span class="section-label" data-i18n="pro.label">PRO FEATURES</span>
+      <h2 id="pro-title" class="section-title section-title-dark" data-i18n="pro.title">Unlock More Power.</h2>
+      <p class="section-subtitle" data-i18n="pro.subtitle">Advanced AI processing, cross-device sync, and professional
+        tools.</p>
+    </div>
+    <div class="pro-grid">
+      <article class="pro-card fade-in delay-1">
+        <h3 class="pro-card-title" data-i18n="pro.ai.title">AI Smart Polish</h3>
+        <p class="pro-card-desc" data-i18n="pro.ai.desc">Transform spoken words into polished written text with custom
+          prompts.</p>
+      </article>
+      <article class="pro-card fade-in delay-2">
+        <h3 class="pro-card-title" data-i18n="pro.iphone.title">iPhone as Mic</h3>
+        <p class="pro-card-desc" data-i18n="pro.iphone.desc">Use your iPhone as a wireless microphone for your Mac.</p>
+      </article>
+      <article class="pro-card fade-in delay-3">
+        <h3 class="pro-card-title" data-i18n="pro.models.title">Large Models</h3>
+        <p class="pro-card-desc" data-i18n="pro.models.desc">Access to small, medium, and large Whisper models for
+          maximum accuracy.</p>
+      </article>
+      <article class="pro-card fade-in delay-4">
+        <h3 class="pro-card-title" data-i18n="pro.batch.title">Batch Transcription</h3>
+        <p class="pro-card-desc" data-i18n="pro.batch.desc">Import audio and video files for bulk transcription with
+          queue management.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing" aria-labelledby="pricing-title">
+    <div class="section-header fade-in">
+      <span class="section-label" data-i18n="pricing.label">PRICING</span>
+      <h2 id="pricing-title" class="section-title section-title-dark" data-i18n="pricing.title">Simple, Fair Pricing.
+      </h2>
+    </div>
+    <div class="pricing-cards">
+      <!-- Free Card -->
+      <article class="pricing-card pricing-card-free fade-in delay-1">
+        <div class="pricing-header">
+          <span class="pricing-name text-black" data-i18n="pricing.free.name">Free</span>
+          <div class="pricing-price">
+            <span class="pricing-price-num text-black">$0</span>
+            <span class="pricing-price-period" data-i18n="pricing.free.period">forever</span>
+          </div>
+          <p class="pricing-desc text-gray-500" data-i18n="pricing.free.desc">Perfect for getting started with local
+            voice typing.</p>
+        </div>
+        <div class="pricing-divider pricing-divider-light"></div>
+        <ul class="pricing-features" role="list">
+          <li class="pricing-feature text-black" data-i18n="pricing.free.f1">✓ Real-time voice transcription</li>
+          <li class="pricing-feature text-black" data-i18n="pricing.free.f2">✓ Tiny & Base Whisper models</li>
+          <li class="pricing-feature text-black" data-i18n="pricing.free.f3">✓ Global hotkey activation</li>
+          <li class="pricing-feature text-black" data-i18n="pricing.free.f4">✓ 100% offline capable</li>
+        </ul>
+        <a href="#download" class="pricing-btn pricing-btn-outline" data-i18n="pricing.free.btn">Download Free</a>
+      </article>
+
+      <!-- Pro Card -->
+      <article class="pricing-card pricing-card-pro fade-in delay-2">
+        <div class="pricing-header">
+          <span class="pricing-badge" data-i18n="pricing.pro.badge">MOST POPULAR</span>
+          <span class="pricing-name text-white">Pro</span>
+          <div class="pricing-price">
+            <span class="pricing-price-num text-white">$29</span>
+            <span class="pricing-price-period text-gray-400" data-i18n="pricing.pro.period">/year</span>
+          </div>
+          <p class="pricing-desc text-gray-400" data-i18n="pricing.pro.desc">Full power for professionals who demand the
+            best.</p>
+        </div>
+        <div class="pricing-divider pricing-divider-dark"></div>
+        <ul class="pricing-features" role="list">
+          <li class="pricing-feature text-white" data-i18n="pricing.pro.f1">✓ Everything in Free</li>
+          <li class="pricing-feature text-white" data-i18n="pricing.pro.f2">✓ AI-powered text polishing</li>
+          <li class="pricing-feature text-white" data-i18n="pricing.pro.f3">✓ All Whisper models (incl. Large)</li>
+          <li class="pricing-feature text-white" data-i18n="pricing.pro.f4">✓ iPhone wireless microphone</li>
+          <li class="pricing-feature text-white" data-i18n="pricing.pro.f5">✓ Batch file transcription</li>
+          <!-- <li class="pricing-feature text-white" data-i18n="pricing.pro.f6">✓ iCloud sync & data export</li> -->
+        </ul>
+        <a href="#upgrade" class="pricing-btn pricing-btn-white" data-i18n="pricing.pro.btn">Upgrade to Pro</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="final-cta" aria-labelledby="cta-title">
+    <h2 id="cta-title" class="final-title fade-in" data-i18n="cta.title">Ready to Type<br>with Your Voice?</h2>
+    <p class="final-subtitle fade-in delay-1" data-i18n="cta.subtitle">Join thousands of Mac users who've transformed
+      their workflow.</p>
+    <a href="#download" class="btn btn-white btn-lg fade-in delay-2" data-i18n="cta.btn">Download Now — It's Free</a>
+    <p class="trust-line fade-in delay-3" data-i18n="cta.trust">macOS 12+ · Apple Silicon Optimized · No Account
+      Required</p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-left">
+      <span class="footer-logo">VoxType</span>
+      <span class="footer-dot" aria-hidden="true">·</span>
+      <span class="footer-tagline" data-i18n="footer.tagline">Voice to Text, Privately.</span>
+    </div>
+    <div class="footer-right">
+      <a href="#privacy" class="footer-link" data-i18n="footer.privacy">Privacy</a>
+      <a href="#terms" class="footer-link" data-i18n="footer.terms">Terms</a>
+      <a href="#contact" class="footer-link" data-i18n="footer.contact">Contact</a>
+      <span class="footer-copy">© 2026 VoxType</span>
+    </div>
+  </footer>
+
+  <!-- i18next CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/i18next@23.7.6/i18next.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
+
+  <!-- Scroll Animation Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const fadeElements = document.querySelectorAll('.fade-in');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+
+      fadeElements.forEach(el => observer.observe(el));
+
+      // Close mobile menu when clicking a link
+      document.querySelectorAll('.mobile-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+          document.getElementById('menu-toggle').checked = false;
+        });
+      });
+    });
+  </script>
+
+  <!-- i18next Internationalization -->
+  <script>
+    // 翻译资源 - 10种语言（扩展至几十种语言）
+    const resources = {
+      en: {
+        translation: {
+          nav: {
+            features: "Features",
+            pricing: "Pricing",
+            faq: "FAQ",
+            download: "Download",
+            downloadFree: "Download Free"
+          },
+          hero: {
+            badge: "macOS Native · Privacy First",
+            title: "Voice to Text,<br>Instantly.",
+            subtitle: "Local Whisper-powered speech recognition for Mac.<br>No cloud. No latency. Just pure privacy.",
+            ctaPrimary: "Download for Free",
+            ctaSecondary: "View Features"
+          },
+          features: {
+            label: "WHY VoxType",
+            title: "Designed for Privacy.<br>Built for Speed.",
+            local: {
+              title: "100% Local Processing",
+              desc: "Your voice never leaves your Mac. All processing happens on-device using the powerful Whisper engine."
+            },
+            latency: {
+              title: "Sub-500ms Latency",
+              desc: "Near real-time transcription powered by Apple Silicon optimization. Speak and see text appear instantly."
+            },
+            offline: {
+              title: "Offline Ready",
+              desc: "Works anywhere without internet. On a plane, in a tunnel, or in a meeting room with no signal."
+            }
+          },
+          pro: {
+            label: "PRO FEATURES",
+            title: "Unlock More Power.",
+            subtitle: "Advanced AI processing, cross-device sync, and professional tools.",
+            ai: {
+              title: "AI Smart Polish",
+              desc: "Transform spoken words into polished written text with custom prompts."
+            },
+            iphone: {
+              title: "iPhone as Mic",
+              desc: "Use your iPhone as a wireless microphone for your Mac."
+            },
+            models: {
+              title: "Large Models",
+              desc: "Access to small, medium, and large Whisper models for maximum accuracy."
+            },
+            batch: {
+              title: "Batch Transcription",
+              desc: "Import audio and video files for bulk transcription with queue management."
+            }
+          },
+          pricing: {
+            label: "PRICING",
+            title: "Simple, Fair Pricing.",
+            free: {
+              name: "Free",
+              period: "forever",
+              desc: "Perfect for getting started with local voice typing.",
+              f1: "✓  Real-time voice transcription",
+              f2: "✓  Tiny & Base Whisper models",
+              f3: "✓  Global hotkey activation",
+              f4: "✓  100% offline capable",
+              btn: "Download Free"
+            },
+            pro: {
+              badge: "MOST POPULAR",
+              period: "/year",
+              desc: "Full power for professionals who demand the best.",
+              f1: "✓  Everything in Free",
+              f2: "✓  AI-powered text polishing",
+              f3: "✓  All Whisper models (incl. Large)",
+              f4: "✓  iPhone wireless microphone",
+              f5: "✓  Batch file transcription",
+              f6: "✓  iCloud sync & data export",
+              btn: "Upgrade to Pro"
+            }
+          },
+          cta: {
+            title: "Ready to Type<br>with Your Voice?",
+            subtitle: "Join thousands of Mac users who've transformed their workflow.",
+            btn: "Download Now — It's Free",
+            trust: "macOS 12+ · Apple Silicon Optimized · No Account Required"
+          },
+          footer: {
+            tagline: "Voice to Text, Privately.",
+            privacy: "Privacy",
+            terms: "Terms",
+            contact: "Contact"
+          }
+        }
+      },
+      zh: {
+        translation: {
+          nav: {
+            features: "功能特性",
+            pricing: "价格",
+            faq: "常见问题",
+            download: "下载",
+            downloadFree: "免费下载"
+          },
+          hero: {
+            badge: "macOS 原生 · 隐私优先",
+            title: "语音转文字，<br>瞬间完成。",
+            subtitle: "本地 Whisper 驱动的 Mac 语音识别。<br>无需云端。零延迟。纯粹的隐私保护。",
+            ctaPrimary: "免费下载",
+            ctaSecondary: "查看功能"
+          },
+          features: {
+            label: "为什么选择 VoxType",
+            title: "为隐私而设计。<br>为速度而生。",
+            local: {
+              title: "100% 本地处理",
+              desc: "您的语音绝不离开 Mac。所有处理都在设备上使用强大的 Whisper 引擎完成。"
+            },
+            latency: {
+              title: "低于 500 毫秒延迟",
+              desc: "Apple Silicon 优化驱动的近实时转录。说话即显示文字。"
+            },
+            offline: {
+              title: "离线可用",
+              desc: "无需互联网即可使用。飞机上、隧道中或无信号会议室都能工作。"
+            }
+          },
+          pro: {
+            label: "专业版功能",
+            title: "解锁更强大的能力。",
+            subtitle: "高级 AI 处理、跨设备同步和专业工具。",
+            ai: {
+              title: "AI 智能润色",
+              desc: "通过自定义提示将口语转换为精致的书面文本。"
+            },
+            iphone: {
+              title: "iPhone 作为麦克风",
+              desc: "将 iPhone 用作 Mac 的无线麦克风。"
+            },
+            models: {
+              title: "大型模型",
+              desc: "访问小型、中型和大型 Whisper 模型以获得最高准确度。"
+            },
+            batch: {
+              title: "批量转录",
+              desc: "导入音频和视频文件进行批量转录，支持队列管理。"
+            }
+          },
+          pricing: {
+            label: "价格",
+            title: "简单、公平的价格。",
+            free: {
+              name: "免费版",
+              period: "永久免费",
+              desc: "开始使用本地语音输入的完美选择。",
+              f1: "✓  实时语音转录",
+              f2: "✓  Tiny 和 Base Whisper 模型",
+              f3: "✓  全局热键激活",
+              f4: "✓  100% 离线可用",
+              btn: "免费下载"
+            },
+            pro: {
+              badge: "最受欢迎",
+              period: "/年",
+              desc: "为追求极致的专业人士提供全部功能。",
+              f1: "✓  免费版所有功能",
+              f2: "✓  AI 智能文本润色",
+              f3: "✓  所有 Whisper 模型（含 Large）",
+              f4: "✓  iPhone 无线麦克风",
+              f5: "✓  批量文件转录",
+              f6: "✓  iCloud 同步与数据导出",
+              btn: "升级到专业版"
+            }
+          },
+          cta: {
+            title: "准备好用声音<br>打字了吗？",
+            subtitle: "加入成千上万改变工作流程的 Mac 用户。",
+            btn: "立即下载 — 完全免费",
+            trust: "macOS 12+ · Apple Silicon 优化 · 无需账户"
+          },
+          footer: {
+            tagline: "私密的语音转文字。",
+            privacy: "隐私政策",
+            terms: "服务条款",
+            contact: "联系我们"
+          }
+        }
+      },
+      "zh-TW": {
+        translation: {
+          nav: {
+            features: "功能特性",
+            pricing: "價格",
+            faq: "常見問題",
+            download: "下載",
+            downloadFree: "免費下載"
+          },
+          hero: {
+            badge: "macOS 原生 · 隱私優先",
+            title: "語音轉文字，<br>瞬間完成。",
+            subtitle: "本機 Whisper 驅動的 Mac 語音辨識。<br>無需雲端。零延遲。純粹的隱私保護。",
+            ctaPrimary: "免費下載",
+            ctaSecondary: "檢視功能"
+          },
+          features: {
+            label: "為何選擇 VoxType",
+            title: "為隱私而設計。<br>為速度而生。",
+            local: {
+              title: "100% 本機處理",
+              desc: "您的語音絕不離開 Mac。所有處理都在裝置上使用強大的 Whisper 引擎完成。"
+            },
+            latency: {
+              title: "低於 500 毫秒延遲",
+              desc: "Apple Silicon 最佳化驅動的近即時轉錄。說話即顯示文字。"
+            },
+            offline: {
+              title: "離線可用",
+              desc: "無需網際網路即可使用。飛機上、隧道中或無訊號會議室都能工作。"
+            }
+          },
+          pro: {
+            label: "專業版功能",
+            title: "解鎖更強大的能力。",
+            subtitle: "進階 AI 處理、跨裝置同步與專業工具。",
+            ai: {
+              title: "AI 智慧潤飾",
+              desc: "透過自訂提示將口語轉換為精緻的書面文字。"
+            },
+            iphone: {
+              title: "iPhone 作為麥克風",
+              desc: "將 iPhone 用作 Mac 的無線麥克風。"
+            },
+            models: {
+              title: "大型模型",
+              desc: "存取小型、中型和大型 Whisper 模型以獲得最高準確度。"
+            },
+            batch: {
+              title: "批次轉錄",
+              desc: "匯入音訊和影片檔案進行批次轉錄，支援佇列管理。"
+            }
+          },
+          pricing: {
+            label: "價格",
+            title: "簡單、公平的價格。",
+            free: {
+              name: "免費版",
+              period: "永久免費",
+              desc: "開始使用本機語音輸入的完美選擇。",
+              f1: "✓  即時語音轉錄",
+              f2: "✓  Tiny 和 Base Whisper 模型",
+              f3: "✓  全域快速鍵啟動",
+              f4: "✓  100% 離線可用",
+              btn: "免費下載"
+            },
+            pro: {
+              badge: "最受歡迎",
+              period: "/年",
+              desc: "為追求極致的專業人士提供全部功能。",
+              f1: "✓  免費版所有功能",
+              f2: "✓  AI 智慧文字潤飾",
+              f3: "✓  所有 Whisper 模型（含 Large）",
+              f4: "✓  iPhone 無線麥克風",
+              f5: "✓  批次檔案轉錄",
+              f6: "✓  iCloud 同步與資料匯出",
+              btn: "升級到專業版"
+            }
+          },
+          cta: {
+            title: "準備好用聲音<br>打字了嗎？",
+            subtitle: "加入成千上萬改變工作流程的 Mac 使用者。",
+            btn: "立即下載 — 完全免費",
+            trust: "macOS 12+ · Apple Silicon 最佳化 · 無需帳戶"
+          },
+          footer: {
+            tagline: "私密的語音轉文字。",
+            privacy: "隱私權政策",
+            terms: "服務條款",
+            contact: "聯絡我們"
+          }
+        }
+      },
+      ja: {
+        translation: {
+          nav: {
+            features: "機能",
+            pricing: "価格",
+            faq: "よくある質問",
+            download: "ダウンロード",
+            downloadFree: "無料ダウンロード"
+          },
+          hero: {
+            badge: "macOS ネイティブ · プライバシー優先",
+            title: "音声からテキストへ、<br>瞬時に。",
+            subtitle: "Mac用ローカルWhisper音声認識。<br>クラウド不要。遅延ゼロ。純粋なプライバシー。",
+            ctaPrimary: "無料でダウンロード",
+            ctaSecondary: "機能を見る"
+          },
+          features: {
+            label: "VoxTypeを選ぶ理由",
+            title: "プライバシーのために設計。<br>スピードのために構築。",
+            local: {
+              title: "100%ローカル処理",
+              desc: "音声はMacから離れません。強力なWhisperエンジンを使用してデバイス上ですべて処理されます。"
+            },
+            latency: {
+              title: "500ms未満の遅延",
+              desc: "Apple Siliconの最適化によるほぼリアルタイムの文字起こし。話すと即座にテキストが表示されます。"
+            },
+            offline: {
+              title: "オフライン対応",
+              desc: "インターネット不要でどこでも動作。飛行機内、トンネル内、信号のない会議室でも。"
+            }
+          },
+          pro: {
+            label: "プロ機能",
+            title: "さらなるパワーを解放。",
+            subtitle: "高度なAI処理、デバイス間同期、プロフェッショナルツール。",
+            ai: {
+              title: "AIスマート研磨",
+              desc: "カスタムプロンプトで話し言葉を洗練された文章に変換。"
+            },
+            iphone: {
+              title: "iPhoneをマイクに",
+              desc: "iPhoneをMacのワイヤレスマイクとして使用。"
+            },
+            models: {
+              title: "大型モデル",
+              desc: "最高の精度を実現するためにsmall、medium、largeのWhisperモデルにアクセス。"
+            },
+            batch: {
+              title: "バッチ文字起こし",
+              desc: "キュー管理でオーディオとビデオファイルを一括文字起こし。"
+            }
+          },
+          pricing: {
+            label: "価格",
+            title: "シンプルで公正な価格。",
+            free: {
+              name: "無料",
+              period: "永久無料",
+              desc: "ローカル音声入力を始めるのに最適。",
+              f1: "✓  リアルタイム音声文字起こし",
+              f2: "✓  TinyとBase Whisperモデル",
+              f3: "✓  グローバルホットキー起動",
+              f4: "✓  100%オフライン対応",
+              btn: "無料ダウンロード"
+            },
+            pro: {
+              badge: "最も人気",
+              period: "/年",
+              desc: "最高を求めるプロフェッショナルのためのフルパワー。",
+              f1: "✓  無料版のすべて",
+              f2: "✓  AI駆動のテキスト研磨",
+              f3: "✓  すべてのWhisperモデル（Large含む）",
+              f4: "✓  iPhoneワイヤレスマイク",
+              f5: "✓  バッチファイル文字起こし",
+              f6: "✓  iCloud同期とデータエクスポート",
+              btn: "プロにアップグレード"
+            }
+          },
+          cta: {
+            title: "音声で<br>タイピングする準備は？",
+            subtitle: "ワークフローを変革した何千人ものMacユーザーに参加しましょう。",
+            btn: "今すぐダウンロード — 無料",
+            trust: "macOS 12+ · Apple Silicon最適化 · アカウント不要"
+          },
+          footer: {
+            tagline: "プライベートな音声からテキストへ。",
+            privacy: "プライバシー",
+            terms: "利用規約",
+            contact: "お問い合わせ"
+          }
+        }
+      },
+      ko: {
+        translation: {
+          nav: {
+            features: "기능",
+            pricing: "가격",
+            faq: "자주 묻는 질문",
+            download: "다운로드",
+            downloadFree: "무료 다운로드"
+          },
+          hero: {
+            badge: "macOS 네이티브 · 프라이버시 우선",
+            title: "음성을 텍스트로,<br>즉시.",
+            subtitle: "Mac용 로컬 Whisper 음성 인식.<br>클라우드 없음. 지연 없음. 순수한 개인정보 보호.",
+            ctaPrimary: "무료 다운로드",
+            ctaSecondary: "기능 보기"
+          },
+          features: {
+            label: "VoxType를 선택하는 이유",
+            title: "프라이버시를 위해 설계.<br>속도를 위해 구축.",
+            local: {
+              title: "100% 로컬 처리",
+              desc: "음성이 Mac을 떠나지 않습니다. 강력한 Whisper 엔진을 사용하여 기기에서 모든 처리가 이루어집니다."
+            },
+            latency: {
+              title: "500ms 미만 지연",
+              desc: "Apple Silicon 최적화로 구동되는 거의 실시간 변환. 말하면 즉시 텍스트가 나타납니다."
+            },
+            offline: {
+              title: "오프라인 지원",
+              desc: "인터넷 없이 어디서나 작동합니다. 비행기, 터널 또는 신호가 없는 회의실에서도."
+            }
+          },
+          pro: {
+            label: "프로 기능",
+            title: "더 강력한 성능을 잠금 해제.",
+            subtitle: "고급 AI 처리, 크로스 디바이스 동기화 및 전문 도구.",
+            ai: {
+              title: "AI 스마트 다듬기",
+              desc: "맞춤 프롬프트로 구어를 세련된 문장으로 변환."
+            },
+            iphone: {
+              title: "iPhone을 마이크로",
+              desc: "iPhone을 Mac의 무선 마이크로 사용."
+            },
+            models: {
+              title: "대형 모델",
+              desc: "최대 정확도를 위해 small, medium, large Whisper 모델에 액세스."
+            },
+            batch: {
+              title: "배치 변환",
+              desc: "대기열 관리로 오디오 및 비디오 파일을 대량 변환."
+            }
+          },
+          pricing: {
+            label: "가격",
+            title: "간단하고 공정한 가격.",
+            free: {
+              name: "무료",
+              period: "영구 무료",
+              desc: "로컬 음성 입력을 시작하기에 완벽.",
+              f1: "✓  실시간 음성 변환",
+              f2: "✓  Tiny 및 Base Whisper 모델",
+              f3: "✓  전역 단축키 활성화",
+              f4: "✓  100% 오프라인 지원",
+              btn: "무료 다운로드"
+            },
+            pro: {
+              badge: "가장 인기",
+              period: "/년",
+              desc: "최고를 요구하는 전문가를 위한 모든 기능.",
+              f1: "✓  무료 버전의 모든 기능",
+              f2: "✓  AI 기반 텍스트 다듬기",
+              f3: "✓  모든 Whisper 모델(Large 포함)",
+              f4: "✓  iPhone 무선 마이크",
+              f5: "✓  배치 파일 변환",
+              f6: "✓  iCloud 동기화 및 데이터 내보내기",
+              btn: "프로로 업그레이드"
+            }
+          },
+          cta: {
+            title: "음성으로<br>타이핑할 준비 되셨나요?",
+            subtitle: "워크플로우를 변화시킨 수천 명의 Mac 사용자와 함께하세요.",
+            btn: "지금 다운로드 — 무료",
+            trust: "macOS 12+ · Apple Silicon 최적화 · 계정 불필요"
+          },
+          footer: {
+            tagline: "비공개 음성에서 텍스트로.",
+            privacy: "개인정보 보호",
+            terms: "이용약관",
+            contact: "문의하기"
+          }
+        }
+      },
+      es: {
+        translation: {
+          nav: {
+            features: "Características",
+            pricing: "Precios",
+            faq: "Preguntas frecuentes",
+            download: "Descargar",
+            downloadFree: "Descargar gratis"
+          },
+          hero: {
+            badge: "macOS nativo · Privacidad primero",
+            title: "Voz a texto,<br>al instante.",
+            subtitle: "Reconocimiento de voz local con Whisper para Mac.<br>Sin nube. Sin latencia. Privacidad pura.",
+            ctaPrimary: "Descargar gratis",
+            ctaSecondary: "Ver características"
+          },
+          features: {
+            label: "POR QUÉ VoxType",
+            title: "Diseñado para la privacidad.<br>Construido para la velocidad.",
+            local: {
+              title: "Procesamiento 100% local",
+              desc: "Tu voz nunca sale de tu Mac. Todo el procesamiento ocurre en el dispositivo usando el potente motor Whisper."
+            },
+            latency: {
+              title: "Latencia inferior a 500ms",
+              desc: "Transcripción casi en tiempo real impulsada por la optimización de Apple Silicon. Habla y ve aparecer el texto al instante."
+            },
+            offline: {
+              title: "Listo para desconexión",
+              desc: "Funciona en cualquier lugar sin internet. En un avión, en un túnel o en una sala de reuniones sin señal."
+            }
+          },
+          pro: {
+            label: "CARACTERÍSTICAS PRO",
+            title: "Desbloquea más poder.",
+            subtitle: "Procesamiento avanzado de IA, sincronización entre dispositivos y herramientas profesionales.",
+            ai: {
+              title: "Pulido inteligente con IA",
+              desc: "Transforma palabras habladas en texto escrito pulido con indicaciones personalizadas."
+            },
+            iphone: {
+              title: "iPhone como micrófono",
+              desc: "Usa tu iPhone como micrófono inalámbrico para tu Mac."
+            },
+            models: {
+              title: "Modelos grandes",
+              desc: "Acceso a modelos Whisper pequeños, medianos y grandes para máxima precisión."
+            },
+            batch: {
+              title: "Transcripción por lotes",
+              desc: "Importa archivos de audio y video para transcripción masiva con gestión de cola."
+            }
+          },
+          pricing: {
+            label: "PRECIOS",
+            title: "Precios simples y justos.",
+            free: {
+              name: "Gratis",
+              period: "para siempre",
+              desc: "Perfecto para comenzar con la escritura por voz local.",
+              f1: "✓  Transcripción de voz en tiempo real",
+              f2: "✓  Modelos Whisper Tiny y Base",
+              f3: "✓  Activación con tecla de acceso global",
+              f4: "✓  100% compatible sin conexión",
+              btn: "Descargar gratis"
+            },
+            pro: {
+              badge: "MÁS POPULAR",
+              period: "/año",
+              desc: "Poder completo para profesionales que exigen lo mejor.",
+              f1: "✓  Todo lo de la versión gratuita",
+              f2: "✓  Pulido de texto con IA",
+              f3: "✓  Todos los modelos Whisper (incl. Large)",
+              f4: "✓  Micrófono inalámbrico iPhone",
+              f5: "✓  Transcripción de archivos por lotes",
+              f6: "✓  Sincronización iCloud y exportación de datos",
+              btn: "Actualizar a Pro"
+            }
+          },
+          cta: {
+            title: "¿Listo para escribir<br>con tu voz?",
+            subtitle: "Únete a miles de usuarios de Mac que han transformado su flujo de trabajo.",
+            btn: "Descargar ahora — Es gratis",
+            trust: "macOS 12+ · Optimizado para Apple Silicon · Sin cuenta requerida"
+          },
+          footer: {
+            tagline: "Voz a texto, con privacidad.",
+            privacy: "Privacidad",
+            terms: "Términos",
+            contact: "Contacto"
+          }
+        }
+      },
+      fr: {
+        translation: {
+          nav: {
+            features: "Fonctionnalités",
+            pricing: "Tarifs",
+            faq: "FAQ",
+            download: "Télécharger",
+            downloadFree: "Téléchargement gratuit"
+          },
+          hero: {
+            badge: "macOS natif · Confidentialité d'abord",
+            title: "Voix en texte,<br>instantanément.",
+            subtitle: "Reconnaissance vocale locale Whisper pour Mac.<br>Pas de cloud. Pas de latence. Juste de la confidentialité pure.",
+            ctaPrimary: "Télécharger gratuitement",
+            ctaSecondary: "Voir les fonctionnalités"
+          },
+          features: {
+            label: "POURQUOI VoxType",
+            title: "Conçu pour la confidentialité.<br>Construit pour la vitesse.",
+            local: {
+              title: "Traitement 100% local",
+              desc: "Votre voix ne quitte jamais votre Mac. Tout le traitement se fait sur l'appareil grâce au puissant moteur Whisper."
+            },
+            latency: {
+              title: "Latence inférieure à 500ms",
+              desc: "Transcription presque en temps réel grâce à l'optimisation Apple Silicon. Parlez et voyez le texte apparaître instantanément."
+            },
+            offline: {
+              title: "Prêt hors ligne",
+              desc: "Fonctionne partout sans internet. Dans un avion, dans un tunnel ou dans une salle de réunion sans signal."
+            }
+          },
+          pro: {
+            label: "FONCTIONNALITÉS PRO",
+            title: "Débloquez plus de puissance.",
+            subtitle: "Traitement IA avancé, synchronisation multi-appareils et outils professionnels.",
+            ai: {
+              title: "Polissage intelligent IA",
+              desc: "Transformez les mots parlés en texte écrit soigné avec des invites personnalisées."
+            },
+            iphone: {
+              title: "iPhone comme micro",
+              desc: "Utilisez votre iPhone comme microphone sans fil pour votre Mac."
+            },
+            models: {
+              title: "Grands modèles",
+              desc: "Accès aux modèles Whisper petits, moyens et grands pour une précision maximale."
+            },
+            batch: {
+              title: "Transcription par lots",
+              desc: "Importez des fichiers audio et vidéo pour une transcription en masse avec gestion de file d'attente."
+            }
+          },
+          pricing: {
+            label: "TARIFS",
+            title: "Tarification simple et équitable.",
+            free: {
+              name: "Gratuit",
+              period: "pour toujours",
+              desc: "Parfait pour commencer avec la saisie vocale locale.",
+              f1: "✓  Transcription vocale en temps réel",
+              f2: "✓  Modèles Whisper Tiny et Base",
+              f3: "✓  Activation par raccourci global",
+              f4: "✓  100% compatible hors ligne",
+              btn: "Télécharger gratuitement"
+            },
+            pro: {
+              badge: "LE PLUS POPULAIRE",
+              period: "/an",
+              desc: "Puissance complète pour les professionnels qui exigent le meilleur.",
+              f1: "✓  Tout de la version gratuite",
+              f2: "✓  Polissage de texte IA",
+              f3: "✓  Tous les modèles Whisper (incl. Large)",
+              f4: "✓  Microphone sans fil iPhone",
+              f5: "✓  Transcription de fichiers par lots",
+              f6: "✓  Synchronisation iCloud et exportation de données",
+              btn: "Passer à Pro"
+            }
+          },
+          cta: {
+            title: "Prêt à taper<br>avec votre voix ?",
+            subtitle: "Rejoignez des milliers d'utilisateurs Mac qui ont transformé leur flux de travail.",
+            btn: "Télécharger maintenant — C'est gratuit",
+            trust: "macOS 12+ · Optimisé Apple Silicon · Aucun compte requis"
+          },
+          footer: {
+            tagline: "Voix en texte, en toute confidentialité.",
+            privacy: "Confidentialité",
+            terms: "Conditions",
+            contact: "Contact"
+          }
+        }
+      },
+      de: {
+        translation: {
+          nav: {
+            features: "Funktionen",
+            pricing: "Preise",
+            faq: "FAQ",
+            download: "Herunterladen",
+            downloadFree: "Kostenlos herunterladen"
+          },
+          hero: {
+            badge: "macOS nativ · Datenschutz zuerst",
+            title: "Sprache zu Text,<br>sofort.",
+            subtitle: "Lokale Whisper-Spracherkennung für Mac.<br>Keine Cloud. Keine Latenz. Reine Privatsphäre.",
+            ctaPrimary: "Kostenlos herunterladen",
+            ctaSecondary: "Funktionen ansehen"
+          },
+          features: {
+            label: "WARUM VoxType",
+            title: "Für Datenschutz entwickelt.<br>Für Geschwindigkeit gebaut.",
+            local: {
+              title: "100% lokale Verarbeitung",
+              desc: "Ihre Stimme verlässt niemals Ihren Mac. Die gesamte Verarbeitung erfolgt auf dem Gerät mit der leistungsstarken Whisper-Engine."
+            },
+            latency: {
+              title: "Unter 500ms Latenz",
+              desc: "Nahezu Echtzeit-Transkription durch Apple Silicon-Optimierung. Sprechen Sie und sehen Sie sofort Text erscheinen."
+            },
+            offline: {
+              title: "Offline bereit",
+              desc: "Funktioniert überall ohne Internet. Im Flugzeug, im Tunnel oder im Besprechungsraum ohne Signal."
+            }
+          },
+          pro: {
+            label: "PRO-FUNKTIONEN",
+            title: "Mehr Leistung freischalten.",
+            subtitle: "Erweiterte KI-Verarbeitung, geräteübergreifende Synchronisierung und professionelle Tools.",
+            ai: {
+              title: "KI-Smart-Polieren",
+              desc: "Verwandeln Sie gesprochene Worte mit benutzerdefinierten Eingabeaufforderungen in polierten geschriebenen Text."
+            },
+            iphone: {
+              title: "iPhone als Mikrofon",
+              desc: "Verwenden Sie Ihr iPhone als kabelloses Mikrofon für Ihren Mac."
+            },
+            models: {
+              title: "Große Modelle",
+              desc: "Zugriff auf kleine, mittlere und große Whisper-Modelle für maximale Genauigkeit."
+            },
+            batch: {
+              title: "Stapeltranskription",
+              desc: "Importieren Sie Audio- und Videodateien für Massentranskription mit Warteschlangenverwaltung."
+            }
+          },
+          pricing: {
+            label: "PREISE",
+            title: "Einfache, faire Preise.",
+            free: {
+              name: "Kostenlos",
+              period: "für immer",
+              desc: "Perfekt für den Einstieg in die lokale Spracheingabe.",
+              f1: "✓  Echtzeit-Sprachtranskription",
+              f2: "✓  Tiny- und Base-Whisper-Modelle",
+              f3: "✓  Globale Tastenkombination",
+              f4: "✓  100% offline-fähig",
+              btn: "Kostenlos herunterladen"
+            },
+            pro: {
+              badge: "AM BELIEBTESTEN",
+              period: "/Jahr",
+              desc: "Volle Leistung für Profis, die das Beste fordern.",
+              f1: "✓  Alles aus der kostenlosen Version",
+              f2: "✓  KI-gestütztes Textpolieren",
+              f3: "✓  Alle Whisper-Modelle (inkl. Large)",
+              f4: "✓  iPhone-Drahtlosmikrofon",
+              f5: "✓  Stapel-Dateitranskription",
+              f6: "✓  iCloud-Synchronisierung und Datenexport",
+              btn: "Auf Pro upgraden"
+            }
+          },
+          cta: {
+            title: "Bereit zum Tippen<br>mit Ihrer Stimme?",
+            subtitle: "Schließen Sie sich Tausenden von Mac-Benutzern an, die ihren Workflow transformiert haben.",
+            btn: "Jetzt herunterladen — Es ist kostenlos",
+            trust: "macOS 12+ · Apple Silicon optimiert · Kein Konto erforderlich"
+          },
+          footer: {
+            tagline: "Sprache zu Text, privat.",
+            privacy: "Datenschutz",
+            terms: "Bedingungen",
+            contact: "Kontakt"
+          }
+        }
+      },
+      pt: {
+        translation: {
+          nav: {
+            features: "Recursos",
+            pricing: "Preços",
+            faq: "Perguntas frequentes",
+            download: "Baixar",
+            downloadFree: "Baixar grátis"
+          },
+          hero: {
+            badge: "macOS nativo · Privacidade em primeiro lugar",
+            title: "Voz para texto,<br>instantaneamente.",
+            subtitle: "Reconhecimento de voz local com Whisper para Mac.<br>Sem nuvem. Sem latência. Apenas privacidade pura.",
+            ctaPrimary: "Baixar grátis",
+            ctaSecondary: "Ver recursos"
+          },
+          features: {
+            label: "POR QUE VoxType",
+            title: "Projetado para privacidade.<br>Construído para velocidade.",
+            local: {
+              title: "Processamento 100% local",
+              desc: "Sua voz nunca sai do seu Mac. Todo o processamento acontece no dispositivo usando o poderoso motor Whisper."
+            },
+            latency: {
+              title: "Latência abaixo de 500ms",
+              desc: "Transcrição quase em tempo real alimentada pela otimização do Apple Silicon. Fale e veja o texto aparecer instantaneamente."
+            },
+            offline: {
+              title: "Pronto para offline",
+              desc: "Funciona em qualquer lugar sem internet. Em um avião, em um túnel ou em uma sala de reuniões sem sinal."
+            }
+          },
+          pro: {
+            label: "RECURSOS PRO",
+            title: "Desbloqueie mais poder.",
+            subtitle: "Processamento avançado de IA, sincronização entre dispositivos e ferramentas profissionais.",
+            ai: {
+              title: "Polimento inteligente com IA",
+              desc: "Transforme palavras faladas em texto escrito polido com prompts personalizados."
+            },
+            iphone: {
+              title: "iPhone como microfone",
+              desc: "Use seu iPhone como microfone sem fio para seu Mac."
+            },
+            models: {
+              title: "Modelos grandes",
+              desc: "Acesso a modelos Whisper pequenos, médios e grandes para máxima precisão."
+            },
+            batch: {
+              title: "Transcrição em lote",
+              desc: "Importe arquivos de áudio e vídeo para transcrição em massa com gerenciamento de fila."
+            }
+          },
+          pricing: {
+            label: "PREÇOS",
+            title: "Preços simples e justos.",
+            free: {
+              name: "Grátis",
+              period: "para sempre",
+              desc: "Perfeito para começar com digitação por voz local.",
+              f1: "✓  Transcrição de voz em tempo real",
+              f2: "✓  Modelos Whisper Tiny e Base",
+              f3: "✓  Ativação por tecla de atalho global",
+              f4: "✓  100% capaz offline",
+              btn: "Baixar grátis"
+            },
+            pro: {
+              badge: "MAIS POPULAR",
+              period: "/ano",
+              desc: "Poder completo para profissionais que exigem o melhor.",
+              f1: "✓  Tudo da versão gratuita",
+              f2: "✓  Polimento de texto com IA",
+              f3: "✓  Todos os modelos Whisper (incl. Large)",
+              f4: "✓  Microfone sem fio iPhone",
+              f5: "✓  Transcrição de arquivos em lote",
+              f6: "✓  Sincronização iCloud e exportação de dados",
+              btn: "Atualizar para Pro"
+            }
+          },
+          cta: {
+            title: "Pronto para digitar<br>com sua voz?",
+            subtitle: "Junte-se a milhares de usuários de Mac que transformaram seu fluxo de trabalho.",
+            btn: "Baixar agora — É grátis",
+            trust: "macOS 12+ · Otimizado para Apple Silicon · Nenhuma conta necessária"
+          },
+          footer: {
+            tagline: "Voz para texto, com privacidade.",
+            privacy: "Privacidade",
+            terms: "Termos",
+            contact: "Contato"
+          }
+        }
+      },
+      ru: {
+        translation: {
+          nav: {
+            features: "Функции",
+            pricing: "Цены",
+            faq: "Часто задаваемые вопросы",
+            download: "Скачать",
+            downloadFree: "Скачать бесплатно"
+          },
+          hero: {
+            badge: "macOS нативный · Конфиденциальность прежде всего",
+            title: "Голос в текст,<br>мгновенно.",
+            subtitle: "Локальное распознавание речи Whisper для Mac.<br>Без облака. Без задержек. Чистая конфиденциальность.",
+            ctaPrimary: "Скачать бесплатно",
+            ctaSecondary: "Посмотреть функции"
+          },
+          features: {
+            label: "ПОЧЕМУ VoxType",
+            title: "Разработано для конфиденциальности.<br>Создано для скорости.",
+            local: {
+              title: "100% локальная обработка",
+              desc: "Ваш голос никогда не покидает ваш Mac. Вся обработка происходит на устройстве с использованием мощного движка Whisper."
+            },
+            latency: {
+              title: "Задержка менее 500мс",
+              desc: "Транскрипция почти в реальном времени благодаря оптимизации Apple Silicon. Говорите и мгновенно видите текст."
+            },
+            offline: {
+              title: "Готов к офлайн",
+              desc: "Работает где угодно без интернета. В самолете, в туннеле или в конференц-зале без сигнала."
+            }
+          },
+          pro: {
+            label: "ПРО ФУНКЦИИ",
+            title: "Разблокируйте больше возможностей.",
+            subtitle: "Расширенная обработка ИИ, кросс-устройственная синхронизация и профессиональные инструменты.",
+            ai: {
+              title: "Умная полировка ИИ",
+              desc: "Превратите устную речь в отполированный письменный текст с пользовательскими подсказками."
+            },
+            iphone: {
+              title: "iPhone как микрофон",
+              desc: "Используйте свой iPhone в качестве беспроводного микрофона для Mac."
+            },
+            models: {
+              title: "Большие модели",
+              desc: "Доступ к маленьким, средним и большим моделям Whisper для максимальной точности."
+            },
+            batch: {
+              title: "Пакетная транскрипция",
+              desc: "Импортируйте аудио и видео файлы для массовой транскрипции с управлением очередью."
+            }
+          },
+          pricing: {
+            label: "ЦЕНЫ",
+            title: "Простые, справедливые цены.",
+            free: {
+              name: "Бесплатно",
+              period: "навсегда",
+              desc: "Идеально для начала работы с локальным голосовым вводом.",
+              f1: "✓  Транскрипция голоса в реальном времени",
+              f2: "✓  Модели Whisper Tiny и Base",
+              f3: "✓  Глобальная горячая клавиша",
+              f4: "✓  100% работа офлайн",
+              btn: "Скачать бесплатно"
+            },
+            pro: {
+              badge: "САМЫЙ ПОПУЛЯРНЫЙ",
+              period: "/год",
+              desc: "Полная мощность для профессионалов, которые требуют лучшего.",
+              f1: "✓  Все из бесплатной версии",
+              f2: "✓  Полировка текста на основе ИИ",
+              f3: "✓  Все модели Whisper (вкл. Large)",
+              f4: "✓  Беспроводной микрофон iPhone",
+              f5: "✓  Пакетная транскрипция файлов",
+              f6: "✓  Синхронизация iCloud и экспорт данных",
+              btn: "Перейти на Pro"
+            }
+          },
+          cta: {
+            title: "Готовы печатать<br>своим голосом?",
+            subtitle: "Присоединяйтесь к тысячам пользователей Mac, которые изменили свой рабочий процесс.",
+            btn: "Скачать сейчас — Бесплатно",
+            trust: "macOS 12+ · Оптимизировано для Apple Silicon · Аккаунт не требуется"
+          },
+          footer: {
+            tagline: "Голос в текст, конфиденциально.",
+            privacy: "Конфиденциальность",
+            terms: "Условия",
+            contact: "Контакты"
+          }
+        }
+      }
+    };
+
+    // 语言显示名称映射
+    const langNames = {
+      en: 'EN',
+      zh: '中文',
+      'zh-TW': '繁中',
+      ja: '日本語',
+      ko: '한국어',
+      es: 'ES',
+      fr: 'FR',
+      de: 'DE',
+      pt: 'PT',
+      ru: 'RU'
+    };
+
+    // 初始化 i18next
+    i18next
+      .use(i18nextBrowserLanguageDetector)
+      .init({
+        resources: resources,
+        fallbackLng: 'en',
+        debug: false,
+        detection: {
+          order: ['localStorage', 'navigator'],
+          caches: ['localStorage'],
+          lookupLocalStorage: 'voxtab-lang'
+        }
+      }, function (err, t) {
+        if (err) {
+          console.error('i18next initialization error:', err);
+          return;
+        }
+
+        // 初始化完成后更新页面
+        updateContent();
+        updateLangSwitcher();
+      });
+
+    // 更新页面内容
+    function updateContent() {
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = i18next.t(key);
+
+        if (translation && translation !== key) {
+          element.innerHTML = translation;
+        }
+      });
+
+      // 更新 HTML lang 属性
+      document.documentElement.lang = i18next.language;
+    }
+
+    // 更新语言切换器
+    function updateLangSwitcher() {
+      const currentLang = i18next.language;
+      document.getElementById('currentLang').textContent = langNames[currentLang] || 'EN';
+
+      // 更新激活状态
+      document.querySelectorAll('.lang-option').forEach(option => {
+        const lang = option.getAttribute('data-lang');
+        if (lang === currentLang) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+    }
+
+    // 切换语言
+    function switchLanguage(lang) {
+      i18next.changeLanguage(lang, function (err, t) {
+        if (err) {
+          console.error('Language change error:', err);
+          return;
+        }
+        updateContent();
+        updateLangSwitcher();
+
+        // 关闭下拉菜单
+        document.getElementById('langSwitcher').classList.remove('open');
+      });
+    }
+
+    // DOM 加载完成后绑定事件
+    document.addEventListener('DOMContentLoaded', function () {
+      // 语言切换器事件
+      const langSwitcher = document.getElementById('langSwitcher');
+      const langBtn = langSwitcher.querySelector('.lang-btn');
+
+      langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langSwitcher.classList.toggle('open');
+      });
+
+      // 语言选项点击事件
+      document.querySelectorAll('.lang-option').forEach(option => {
+        option.addEventListener('click', () => {
+          const lang = option.getAttribute('data-lang');
+          switchLanguage(lang);
+        });
+      });
+
+      // 点击外部关闭下拉菜单
+      document.addEventListener('click', () => {
+        langSwitcher.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+
+</html>
