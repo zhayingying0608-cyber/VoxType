@@ -34,6 +34,8 @@ final class RecordingState: ObservableObject {
 
     private let realtimeSpeechService = RealtimeSpeechService.shared
     private let overlayManager = TranscriptionOverlayManager.shared
+    private let historyManager = HistoryManager.shared
+    private var recordingStartTime: Date?
 
     private init() {
         Task {
@@ -89,6 +91,7 @@ final class RecordingState: ObservableObject {
             // 显示悬浮窗
             overlayManager.show()
 
+            recordingStartTime = Date()
             try await realtimeSpeechService.startRecording()
             status = .recording
         } catch {
@@ -101,9 +104,17 @@ final class RecordingState: ObservableObject {
     private func performStopRecording() async {
         status = .transcribing
 
+        // 计算录音时长
+        let duration: TimeInterval? = recordingStartTime.map { Date().timeIntervalSince($0) }
+
         // 停止录音并获取最终转写结果
         let finalText = await realtimeSpeechService.stopRecording()
         transcribedText = finalText
+
+        // 保存到历史记录
+        if !finalText.isEmpty {
+            historyManager.addRecord(text: finalText, duration: duration)
+        }
 
         // 更新悬浮窗
         overlayManager.updateText(finalText)
@@ -115,6 +126,7 @@ final class RecordingState: ObservableObject {
         }
 
         status = .idle
+        recordingStartTime = nil
 
         // 延迟关闭悬浮窗
         try? await Task.sleep(nanoseconds: 500_000_000)

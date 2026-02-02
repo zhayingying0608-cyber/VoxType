@@ -144,14 +144,14 @@ struct TranslateSettingsSection: View {
                 .foregroundColor(.black)
 
             // 自动检测语言
-            SettingToggleRow(
+            TranslateSettingToggleRow(
                 title: "自动检测语言",
                 description: "自动识别输入内容的语言",
                 isOn: $autoDetectLanguage
             )
 
             // 显示原文
-            SettingToggleRow(
+            TranslateSettingToggleRow(
                 title: "显示原文",
                 description: "翻译结果同时显示原文内容",
                 isOn: $showOriginalText
@@ -161,7 +161,7 @@ struct TranslateSettingsSection: View {
 }
 
 // MARK: - 设置开关行
-struct SettingToggleRow: View {
+struct TranslateSettingToggleRow: View {
     let title: String
     let description: String
     @Binding var isOn: Bool

@@ -6,6 +6,7 @@ import AppKit
 struct VoxTypeApp: App {
     @State private var selectedPage: SidebarMenuItem = .general
     @StateObject private var recordingState = RecordingState.shared
+    @ObservedObject private var themeManager = ThemeManager.shared
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
@@ -20,6 +21,7 @@ struct VoxTypeApp: App {
         // 设置窗口
         Window("VoxType 设置", id: "settings") {
             ContentView(selectedPage: $selectedPage)
+                .preferredColorScheme(themeManager.colorScheme)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -40,13 +42,14 @@ struct VoxTypeApp: App {
 // MARK: - 菜单栏内容视图
 struct MenuBarContentView: View {
     @ObservedObject var recordingState: RecordingState
+    @ObservedObject private var languageManager = LanguageManager.shared
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(spacing: 0) {
             // 状态显示
             if !recordingState.isModelLoaded {
-                Text("正在加载模型...")
+                Text(languageManager.localized(.loadingModel))
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Divider()
@@ -63,7 +66,7 @@ struct MenuBarContentView: View {
 
             // 显示转写状态
             if recordingState.status == .transcribing {
-                Text("正在转写...")
+                Text(languageManager.localized(.transcribing))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -71,7 +74,7 @@ struct MenuBarContentView: View {
             // 最近转写的文本
             if !recordingState.transcribedText.isEmpty {
                 Divider()
-                Text("已复制到剪贴板")
+                Text(languageManager.localized(.copiedToClipboard))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -79,7 +82,7 @@ struct MenuBarContentView: View {
             Divider()
 
             // 设置
-            Button("设置...") {
+            Button(languageManager.localized(.settings) + "...") {
                 openWindow(id: "settings")
                 NSApp.activate(ignoringOtherApps: true)
             }
@@ -88,7 +91,7 @@ struct MenuBarContentView: View {
             Divider()
 
             // 退出
-            Button("退出 VoxType") {
+            Button(languageManager.localized(.quit)) {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q", modifiers: .command)
@@ -101,11 +104,11 @@ struct MenuBarContentView: View {
     private var recordingButtonTitle: String {
         switch recordingState.status {
         case .idle, .error:
-            return "开始录音"
+            return languageManager.localized(.startRecording)
         case .recording:
-            return "停止录音"
+            return languageManager.localized(.stopRecording)
         case .transcribing:
-            return "转写中..."
+            return languageManager.localized(.transcribing)
         }
     }
 
@@ -135,10 +138,16 @@ struct MenuBarContentView: View {
 // MARK: - 主视图容器
 struct ContentView: View {
     @Binding var selectedPage: SidebarMenuItem
+    @ObservedObject private var themeManager = ThemeManager.shared
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var colors: ThemeColors {
+        ThemeColors(theme: themeManager.currentTheme, systemColorScheme: colorScheme)
+    }
 
     var body: some View {
         HStack(spacing: 0) {
-            SidebarView(selectedItem: $selectedPage)
+            SidebarView(selectedItem: $selectedPage, colors: colors)
 
             // 根据选中的页面显示不同内容
             Group {
@@ -166,7 +175,7 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.white)
+            .background(colors.background)
         }
         .frame(width: 1000, height: 680)
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -175,16 +184,16 @@ struct ContentView: View {
 
 // MARK: - 侧边栏菜单项枚举
 enum SidebarMenuItem: String, CaseIterable {
-    case general = "设置"
-    case phonePairing = "手机配对"
-    case model = "听写模型"
-    case files = "转录文件"
-    case history = "历史记录"
-    case translate = "翻译"
-    case shortcuts = "快捷键"
-    case aiPrompt = "AI 提示词"
-    case contact = "联系我们"
-    case upgradePro = "升级 Pro"
+    case general = "settings"
+    case phonePairing = "phonePairing"
+    case model = "model"
+    case files = "files"
+    case history = "history"
+    case translate = "translate"
+    case shortcuts = "shortcuts"
+    case aiPrompt = "aiPrompt"
+    case contact = "contact"
+    case upgradePro = "upgradePro"
 
     var icon: String {
         switch self {
@@ -209,11 +218,58 @@ enum SidebarMenuItem: String, CaseIterable {
             return true
         }
     }
+
+    func displayName(for language: AppLanguage) -> String {
+        switch self {
+        case .general:
+            return language == .en ? "Settings" :
+                   language == .ja ? "設定" :
+                   language == .zhHant ? "設定" : "设置"
+        case .phonePairing:
+            return language == .en ? "Phone Pairing" :
+                   language == .ja ? "スマホ連携" :
+                   language == .zhHant ? "手機配對" : "手机配对"
+        case .model:
+            return language == .en ? "Transcription Model" :
+                   language == .ja ? "聴写モデル" :
+                   language == .zhHant ? "聽寫模型" : "听写模型"
+        case .files:
+            return language == .en ? "Transcribed Files" :
+                   language == .ja ? "変換ファイル" :
+                   language == .zhHant ? "轉錄檔案" : "转录文件"
+        case .history:
+            return language == .en ? "History" :
+                   language == .ja ? "履歴" :
+                   language == .zhHant ? "歷史記錄" : "历史记录"
+        case .translate:
+            return language == .en ? "Translate" :
+                   language == .ja ? "翻訳" :
+                   language == .zhHant ? "翻譯" : "翻译"
+        case .shortcuts:
+            return language == .en ? "Shortcuts" :
+                   language == .ja ? "ショートカット" :
+                   language == .zhHant ? "快捷鍵" : "快捷键"
+        case .aiPrompt:
+            return language == .en ? "AI Prompts" :
+                   language == .ja ? "AI プロンプト" :
+                   language == .zhHant ? "AI 提示詞" : "AI 提示词"
+        case .contact:
+            return language == .en ? "Contact Us" :
+                   language == .ja ? "お問い合わせ" :
+                   language == .zhHant ? "聯繫我們" : "联系我们"
+        case .upgradePro:
+            return language == .en ? "Upgrade Pro" :
+                   language == .ja ? "Pro にアップグレード" :
+                   language == .zhHant ? "升級 Pro" : "升级 Pro"
+        }
+    }
 }
 
 // MARK: - 侧边栏视图
 struct SidebarView: View {
     @Binding var selectedItem: SidebarMenuItem
+    @ObservedObject private var languageManager = LanguageManager.shared
+    let colors: ThemeColors
 
     var body: some View {
         VStack(spacing: 0) {
@@ -221,18 +277,18 @@ struct SidebarView: View {
                 // App Header
                 HStack(spacing: 10) {
                     RoundedRectangle(cornerRadius: 7)
-                        .fill(Color.black)
+                        .fill(colors.sidebarSelectedBackground)
                         .frame(width: 28, height: 28)
                         .overlay(
                             Image(systemName: "mic.fill")
                                 .font(.system(size: 14))
-                                .foregroundColor(.white)
+                                .foregroundColor(colors.sidebarSelectedText)
                         )
 
                     Text("VoxType")
                         .font(.custom("Outfit", size: 16))
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(colors.primaryText)
                         .kerning(-0.5)
                 }
                 .padding(.horizontal, 20)
@@ -242,7 +298,12 @@ struct SidebarView: View {
                 VStack(spacing: 2) {
                     ForEach(SidebarMenuItem.allCases.filter { $0.showInMenu }, id: \.self) { item in
                         Button(action: { selectedItem = item }) {
-                            SidebarMenuItemView(item: item, isSelected: item == selectedItem)
+                            SidebarMenuItemView(
+                                item: item,
+                                isSelected: item == selectedItem,
+                                colors: colors,
+                                language: languageManager.currentLanguage
+                            )
                         }
                         .buttonStyle(.plain)
                     }
@@ -259,17 +320,17 @@ struct SidebarView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "crown.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(.white)
+                        .foregroundColor(colors.sidebarSelectedText)
 
-                    Text("升级 Pro")
+                    Text(SidebarMenuItem.upgradePro.displayName(for: languageManager.currentLanguage))
                         .font(.custom("Outfit", size: 14))
                         .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                        .foregroundColor(colors.sidebarSelectedText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(Color.black)
+                .background(colors.sidebarSelectedBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .buttonStyle(.plain)
@@ -277,7 +338,7 @@ struct SidebarView: View {
             .padding(.bottom, 16)
         }
         .frame(width: 240)
-        .background(Color(hex: "F4F4F5"))
+        .background(colors.sidebarBackground)
     }
 }
 
@@ -285,24 +346,26 @@ struct SidebarView: View {
 struct SidebarMenuItemView: View {
     let item: SidebarMenuItem
     let isSelected: Bool
+    let colors: ThemeColors
+    let language: AppLanguage
 
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: item.icon)
                 .font(.system(size: 16))
-                .foregroundColor(isSelected ? .white : Color(hex: "71717A"))
+                .foregroundColor(isSelected ? colors.sidebarSelectedText : colors.secondaryText)
                 .frame(width: 18, height: 18)
 
-            Text(item.rawValue)
+            Text(item.displayName(for: language))
                 .font(.custom("Outfit", size: 14))
                 .fontWeight(.medium)
-                .foregroundColor(isSelected ? .white : .black)
+                .foregroundColor(isSelected ? colors.sidebarSelectedText : colors.primaryText)
 
             Spacer()
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(isSelected ? Color.black : Color.clear)
+        .background(isSelected ? colors.sidebarSelectedBackground : Color.clear)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }

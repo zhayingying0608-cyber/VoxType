@@ -1,38 +1,48 @@
 import SwiftUI
+import AppKit
 
 // MARK: - 历史记录内容视图
 struct HistoryContentView: View {
-    @State private var selectedFilter = "全部"
+    @ObservedObject private var historyManager = HistoryManager.shared
+    @ObservedObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var themeManager = ThemeManager.shared
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var selectedFilter = "all"
     @State private var searchText = ""
+    @State private var showClearAlert = false
 
-    let filters = ["全部", "今天", "本周", "本月"]
+    private var colors: ThemeColors {
+        ThemeColors(theme: themeManager.currentTheme, systemColorScheme: colorScheme)
+    }
 
-    let records = [
-        HistoryRecord(
-            title: "产品需求讨论会议",
-            preview: "今天我们主要讨论一下新版本的功能需求，首先是用户反馈最多的几个问题...",
-            date: "今天 14:32",
-            duration: "32:15"
-        ),
-        HistoryRecord(
-            title: "技术方案评审",
-            preview: "关于这个技术方案，我有几点建议。第一，我们需要考虑系统的可扩展性...",
-            date: "今天 10:15",
-            duration: "45:30"
-        ),
-        HistoryRecord(
-            title: "用户访谈记录",
-            preview: "您好，感谢您抽出时间参与我们的用户访谈。首先想了解一下您使用我们产品的频率...",
-            date: "昨天 16:20",
-            duration: "28:45"
-        ),
-        HistoryRecord(
-            title: "周会纪要",
-            preview: "本周工作总结：1. 完成了新功能的开发和测试 2. 修复了用户反馈的几个 bug...",
-            date: "昨天 09:00",
-            duration: "58:22"
-        )
-    ]
+    private var filteredRecords: [TranscriptionRecord] {
+        var records = historyManager.records
+
+        // 按时间筛选
+        let calendar = Calendar.current
+        let now = Date()
+
+        switch selectedFilter {
+        case "today":
+            records = records.filter { calendar.isDateInToday($0.timestamp) }
+        case "week":
+            let weekAgo = calendar.date(byAdding: .day, value: -7, to: now)!
+            records = records.filter { $0.timestamp >= weekAgo }
+        case "month":
+            let monthAgo = calendar.date(byAdding: .month, value: -1, to: now)!
+            records = records.filter { $0.timestamp >= monthAgo }
+        default:
+            break
+        }
+
+        // 按搜索词筛选
+        if !searchText.isEmpty {
+            records = records.filter { $0.text.localizedCaseInsensitiveContains(searchText) }
+        }
+
+        return records
+    }
 
     var body: some View {
         ScrollView {
@@ -40,15 +50,15 @@ struct HistoryContentView: View {
                 // 页面标题和搜索
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("历史记录")
+                        Text(languageManager.localized(.history))
                             .font(.custom("Outfit", size: 28))
                             .fontWeight(.bold)
                             .kerning(-1)
-                            .foregroundColor(.black)
+                            .foregroundColor(colors.primaryText)
 
-                        Text("查看和管理所有转写记录")
+                        Text(languageManager.localized(.historyDesc))
                             .font(.custom("Inter", size: 14))
-                            .foregroundColor(Color(hex: "71717A"))
+                            .foregroundColor(colors.secondaryText)
                     }
 
                     Spacer()
@@ -57,37 +67,70 @@ struct HistoryContentView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 16))
-                            .foregroundColor(Color(hex: "A1A1AA"))
+                            .foregroundColor(colors.secondaryText)
 
-                        TextField("搜索记录...", text: $searchText)
+                        TextField("搜索...", text: $searchText)
                             .font(.custom("Inter", size: 13))
                             .textFieldStyle(.plain)
+                            .foregroundColor(colors.primaryText)
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Color(hex: "F4F4F5"))
+                    .background(colors.secondaryBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: 220)
                 }
 
-                // 历史内容
-                VStack(spacing: 16) {
-                    // 筛选标签
-                    HStack(spacing: 8) {
-                        ForEach(filters, id: \.self) { filter in
-                            FilterButton(
-                                title: filter,
-                                isSelected: selectedFilter == filter
-                            ) {
-                                selectedFilter = filter
-                            }
-                        }
+                // 筛选和清空按钮
+                HStack(spacing: 8) {
+                    FilterChip(title: filterTitle("all"), isSelected: selectedFilter == "all") {
+                        selectedFilter = "all"
+                    }
+                    FilterChip(title: filterTitle("today"), isSelected: selectedFilter == "today") {
+                        selectedFilter = "today"
+                    }
+                    FilterChip(title: filterTitle("week"), isSelected: selectedFilter == "week") {
+                        selectedFilter = "week"
+                    }
+                    FilterChip(title: filterTitle("month"), isSelected: selectedFilter == "month") {
+                        selectedFilter = "month"
                     }
 
-                    // 记录列表
+                    Spacer()
+
+                    if !historyManager.records.isEmpty {
+                        Button(action: { showClearAlert = true }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 12))
+                                Text(languageManager.localized(.clearHistory))
+                                    .font(.custom("Inter", size: 12))
+                            }
+                            .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                // 记录列表
+                if filteredRecords.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "clock.badge.questionmark")
+                            .font(.system(size: 48))
+                            .foregroundColor(colors.secondaryText.opacity(0.5))
+
+                        Text(languageManager.localized(.noHistory))
+                            .font(.custom("Inter", size: 15))
+                            .foregroundColor(colors.secondaryText)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 60)
+                } else {
                     VStack(spacing: 12) {
-                        ForEach(records) { record in
-                            HistoryRow(record: record)
+                        ForEach(filteredRecords) { record in
+                            HistoryRecordRow(record: record, colors: colors) {
+                                historyManager.deleteRecord(record)
+                            }
                         }
                     }
                 }
@@ -95,83 +138,137 @@ struct HistoryContentView: View {
             .padding(32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
+        .background(colors.background)
+        .alert("确认清空", isPresented: $showClearAlert) {
+            Button("取消", role: .cancel) {}
+            Button("清空", role: .destructive) {
+                historyManager.clearAll()
+            }
+        } message: {
+            Text("确定要清空所有历史记录吗？此操作不可撤销。")
+        }
+    }
+
+    private func filterTitle(_ key: String) -> String {
+        switch key {
+        case "all":
+            return languageManager.currentLanguage == .en ? "All" :
+                   languageManager.currentLanguage == .ja ? "すべて" : "全部"
+        case "today":
+            return languageManager.currentLanguage == .en ? "Today" :
+                   languageManager.currentLanguage == .ja ? "今日" : "今天"
+        case "week":
+            return languageManager.currentLanguage == .en ? "This Week" :
+                   languageManager.currentLanguage == .ja ? "今週" : "本周"
+        case "month":
+            return languageManager.currentLanguage == .en ? "This Month" :
+                   languageManager.currentLanguage == .ja ? "今月" : "本月"
+        default:
+            return key
+        }
     }
 }
 
-// MARK: - 历史记录
-struct HistoryRecord: Identifiable {
-    let id = UUID()
+// MARK: - 筛选按钮
+struct FilterChip: View {
     let title: String
-    let preview: String
-    let date: String
-    let duration: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    @ObservedObject private var themeManager = ThemeManager.shared
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var colors: ThemeColors {
+        ThemeColors(theme: themeManager.currentTheme, systemColorScheme: colorScheme)
+    }
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.custom("Inter", size: 13))
+                .fontWeight(.medium)
+                .foregroundColor(isSelected ? colors.sidebarSelectedText : colors.primaryText)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(isSelected ? colors.sidebarSelectedBackground : colors.secondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 // MARK: - 历史记录行
-struct HistoryRow: View {
-    let record: HistoryRecord
+struct HistoryRecordRow: View {
+    let record: TranscriptionRecord
+    let colors: ThemeColors
+    let onDelete: () -> Void
+
+    @State private var isHovered = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // 标题行
+            // 顶部信息
             HStack {
-                Text(record.title)
-                    .font(.custom("Outfit", size: 15))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-
-                Spacer()
-
-                Text(record.date)
+                Text(record.formattedDate)
                     .font(.custom("Inter", size: 12))
-                    .foregroundColor(Color(hex: "A1A1AA"))
-            }
+                    .foregroundColor(colors.secondaryText)
 
-            // 预览文本
-            Text(record.preview)
-                .font(.custom("Inter", size: 13))
-                .foregroundColor(Color(hex: "71717A"))
-                .lineLimit(2)
+                if let duration = record.formattedDuration {
+                    Text("•")
+                        .foregroundColor(colors.secondaryText)
 
-            // 底部信息
-            HStack {
-                HStack(spacing: 4) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "A1A1AA"))
-
-                    Text(record.duration)
-                        .font(.custom("Inter", size: 12))
-                        .foregroundColor(Color(hex: "A1A1AA"))
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock")
+                            .font(.system(size: 11))
+                        Text(duration)
+                            .font(.custom("Inter", size: 12))
+                    }
+                    .foregroundColor(colors.secondaryText)
                 }
 
                 Spacer()
 
                 // 操作按钮
-                HStack(spacing: 8) {
-                    SmallIconButton(icon: "doc.on.doc")
-                    SmallIconButton(icon: "square.and.arrow.up")
-                    SmallIconButton(icon: "trash")
+                if isHovered {
+                    HStack(spacing: 8) {
+                        Button(action: copyToClipboard) {
+                            Image(systemName: "doc.on.doc")
+                                .font(.system(size: 12))
+                                .foregroundColor(colors.secondaryText)
+                        }
+                        .buttonStyle(.plain)
+                        .help("复制")
+
+                        Button(action: onDelete) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red.opacity(0.8))
+                        }
+                        .buttonStyle(.plain)
+                        .help("删除")
+                    }
                 }
             }
+
+            // 文本内容
+            Text(record.text)
+                .font(.custom("Inter", size: 14))
+                .foregroundColor(colors.primaryText)
+                .lineLimit(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(16)
-        .background(Color(hex: "F4F4F5"))
+        .background(colors.secondaryBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-// MARK: - 小图标按钮
-struct SmallIconButton: View {
-    let icon: String
-
-    var body: some View {
-        Button(action: {}) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundColor(Color(hex: "71717A"))
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
         }
-        .buttonStyle(.plain)
+    }
+
+    private func copyToClipboard() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(record.text, forType: .string)
     }
 }

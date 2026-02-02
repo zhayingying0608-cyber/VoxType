@@ -55,7 +55,7 @@ struct FilesContentView: View {
                     // 筛选标签
                     HStack(spacing: 8) {
                         ForEach(filters, id: \.self) { filter in
-                            FilterButton(
+                            FilesFilterButton(
                                 title: filter,
                                 isSelected: selectedFilter == filter
                             ) {
@@ -89,7 +89,7 @@ struct FileRecord: Identifiable {
 }
 
 // MARK: - 筛选按钮
-struct FilterButton: View {
+struct FilesFilterButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
