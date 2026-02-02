@@ -1,2 +1,9 @@
 .DS_Store
 *.pen
+
+# Xcode / Swift
+VoxTypeApp/.build/
+*.xcuserstate
+*.xcworkspacedata
+DerivedData/
+*.zip
