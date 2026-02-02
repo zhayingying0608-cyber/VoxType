@@ -130,7 +130,7 @@ struct TranscriptionOverlayView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "keyboard")
                         .font(.system(size: 9))
-                    Text("松开完成")
+                    Text("松开 ⌥ 或双击 ⇧⇧ 完成")
                         .font(.system(size: 10, weight: .medium))
                 }
                 .foregroundColor(.white.opacity(0.4))

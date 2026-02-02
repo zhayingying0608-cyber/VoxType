@@ -13,7 +13,7 @@ struct ShortcutsContentView: View {
                         .kerning(-1)
                         .foregroundColor(.black)
 
-                    Text("配置全局快捷键")
+                    Text("两种方式触发语音转写")
                         .font(.custom("Inter", size: 14))
                         .foregroundColor(Color(hex: "71717A"))
                 }
@@ -25,19 +25,52 @@ struct ShortcutsContentView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.black)
 
-                    // 开始/停止录音
-                    ShortcutRecorderRow(
-                        title: "开始/停止录音",
-                        description: "按下快捷键开始或停止语音转写",
-                        shortcutName: .toggleRecording
+                    // 长按 Option
+                    ShortcutDisplayRow(
+                        title: "长按 Option",
+                        description: "按住 Option 键开始录音，松开自动停止并转写",
+                        shortcut: "⌥ 长按"
                     )
 
-                    // 暂停/继续录音
-                    ShortcutRecorderRow(
-                        title: "暂停/继续录音",
-                        description: "按下快捷键暂停或继续当前录音",
-                        shortcutName: .pauseRecording
+                    // 双击 Shift
+                    ShortcutDisplayRow(
+                        title: "双击 Shift",
+                        description: "快速双击 Shift 键切换录音状态",
+                        shortcut: "⇧⇧"
                     )
+                }
+
+                // 使用说明
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("使用说明")
+                        .font(.custom("Outfit", size: 16))
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top, spacing: 12) {
+                            Text("1.")
+                                .font(.custom("Inter", size: 14))
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color(hex: "71717A"))
+                            Text("长按模式：按住 Option 键说话，松开后自动转写并粘贴")
+                                .font(.custom("Inter", size: 14))
+                                .foregroundColor(.black)
+                        }
+
+                        HStack(alignment: .top, spacing: 12) {
+                            Text("2.")
+                                .font(.custom("Inter", size: 14))
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color(hex: "71717A"))
+                            Text("切换模式：双击 Shift 开始录音，再双击停止录音")
+                                .font(.custom("Inter", size: 14))
+                                .foregroundColor(.black)
+                        }
+                    }
+                    .padding(16)
+                    .background(Color(hex: "F4F4F5"))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
             .padding(32)
@@ -47,59 +80,8 @@ struct ShortcutsContentView: View {
     }
 }
 
-// MARK: - 快捷键录制行
-struct ShortcutRecorderRow: View {
-    let title: String
-    let description: String
-    let shortcutName: ShortcutName
-
-    @State private var shortcut: GlobalShortcut
-
-    init(title: String, description: String, shortcutName: ShortcutName) {
-        self.title = title
-        self.description = description
-        self.shortcutName = shortcutName
-        self._shortcut = State(initialValue: GlobalShortcutManager.shared.getShortcut(shortcutName))
-    }
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.custom("Outfit", size: 15))
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-
-                Text(description)
-                    .font(.custom("Inter", size: 13))
-                    .foregroundColor(Color(hex: "71717A"))
-            }
-
-            Spacer()
-
-            // 快捷键显示
-            Text(shortcut.displayString)
-                .font(.custom("Inter", size: 13))
-                .fontWeight(.medium)
-                .foregroundColor(.black)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color(hex: "E4E4E7"), lineWidth: 1)
-                )
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .background(Color(hex: "F4F4F5"))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-// MARK: - 快捷键行 (静态显示，保留给其他地方使用)
-struct ShortcutRow: View {
+// MARK: - 快捷键显示行
+struct ShortcutDisplayRow: View {
     let title: String
     let description: String
     let shortcut: String
@@ -119,22 +101,17 @@ struct ShortcutRow: View {
 
             Spacer()
 
-            // 快捷键显示
-            Button(action: {}) {
-                Text(shortcut)
-                    .font(.custom("Inter", size: 13))
-                    .fontWeight(.medium)
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color(hex: "E4E4E7"), lineWidth: 1)
-                    )
-            }
-            .buttonStyle(.plain)
+            Text(shortcut)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundColor(.black)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color(hex: "E4E4E7"), lineWidth: 1)
+                )
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)

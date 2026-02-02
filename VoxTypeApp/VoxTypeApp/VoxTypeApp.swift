@@ -112,14 +112,19 @@ struct MenuBarContentView: View {
     private func setupGlobalShortcuts() {
         let shortcutManager = GlobalShortcutManager.shared
 
-        // 长按开始录音
-        shortcutManager.setKeyDownHandler(for: .toggleRecording) { [weak recordingState] in
-            recordingState?.startRecording()
-        }
+        // 长按 Option：按住开始录音，松开停止
+        shortcutManager.setOptionHandlers(
+            onPress: { [weak recordingState] in
+                recordingState?.startRecording()
+            },
+            onRelease: { [weak recordingState] in
+                recordingState?.stopRecording()
+            }
+        )
 
-        // 释放停止录音
-        shortcutManager.setKeyUpHandler(for: .toggleRecording) { [weak recordingState] in
-            recordingState?.stopRecording()
+        // 双击 Shift：切换录音状态
+        shortcutManager.setShiftDoubleClickHandler { [weak recordingState] in
+            recordingState?.toggleRecording()
         }
 
         // 开始监听键盘事件
